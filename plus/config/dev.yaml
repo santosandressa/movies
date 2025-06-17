@@ -1,0 +1,11 @@
+# dev.yaml - API Configuration for Movies Project
+
+themoviedb:
+  base_url: "https://api.themoviedb.org/3"
+  read_token: "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1NTU3ZDA4MjA5OGZhMzlhOGM5NjJiMzBiYjNjMzdkZiIsIm5iZiI6MTc1MDE4NjY1OC4wNjIsInN1YiI6IjY4NTFiYWEyNzE0ZTA1YWNiOTA2NWYxNCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.UkvxopcHvoI6PFl5inN3oPh_cGJ7jZ5UZRTcROv2ZGE"
+  api_key: "5557d082098fa39a8c962b30bb3c37df"
+  image_base_url: "https://image.tmdb.org/t/p/"
+  default_language: "en-US"
+  include_adult: false
+  poster_size: "w500"
+  backdrop_size: "original"
