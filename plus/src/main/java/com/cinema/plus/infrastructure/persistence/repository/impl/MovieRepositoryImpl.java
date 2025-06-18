@@ -2,14 +2,14 @@ package com.cinema.plus.infrastructure.persistence.repository.impl;
 
 import com.cinema.plus.domain.entity.Movie;
 import com.cinema.plus.domain.ports.repository.MovieRepository;
-import com.cinema.plus.infrastructure.persistence.client.TmdbClient;
-import com.cinema.plus.infrastructure.persistence.client.model.TmdbMovieDetailResponse;
-import com.cinema.plus.infrastructure.config.TmdbProperties;
 import com.cinema.plus.infrastructure.entity.MovieEntity;
 import com.cinema.plus.infrastructure.mapper.MovieMapper;
+import com.cinema.plus.infrastructure.persistence.client.TmdbClient;
+import com.cinema.plus.infrastructure.persistence.client.model.TmdbMovieDetailResponse;
 import com.cinema.plus.infrastructure.persistence.repository.MovieJpaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -26,16 +26,24 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MovieRepositoryImpl implements MovieRepository {
     private final TmdbClient tmdbClient;
-    private final TmdbProperties tmdbProperties;
     private final MovieJpaRepository movieJpaRepository;
     private final MovieMapper movieMapper;
+
+    @Value("${api.themoviedb.token}")
+    private String apiKey;
+
+    @Value("${api.themoviedb.language}")
+    private String language;
+
+    @Value("${api.themoviedb.image-url}")
+    private String imageUrl;
 
     @Override
     public List<Movie> findPopularMovies(int page) {
         return tmdbClient.getPopularMovies(
-                        tmdbProperties.getApiKey(),
+                        "Bearer " + apiKey,
                         page,
-                        tmdbProperties.getLanguage())
+                        language)
                 .getResults()
                 .stream()
                 .map(tmdbMovie -> {
@@ -45,7 +53,7 @@ public class MovieRepositoryImpl implements MovieRepository {
                             .title(tmdbMovie.getTitle())
                             .overview(tmdbMovie.getOverview())
                             .voteAverage(tmdbMovie.getVoteAverage())
-                            .posterPath(tmdbProperties.getImageBaseUrl() + tmdbMovie.getPosterPath())
+                            .posterPath(imageUrl + tmdbMovie.getPosterPath())
                             .build();
                     try {
                         if (tmdbMovie.getReleaseDate() != null && !tmdbMovie.getReleaseDate().isEmpty()) {
@@ -60,16 +68,16 @@ public class MovieRepositoryImpl implements MovieRepository {
 
                     return movie;
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
     public List<Movie> searchMovies(String query, int page) {
         return tmdbClient.searchMovies(
-                        tmdbProperties.getApiKey(),
+                        "Bearer " + apiKey,
                         query,
                         page,
-                        tmdbProperties.getLanguage())
+                        language)
                 .getResults()
                 .stream()
                 .map(tmdbMovie -> {
@@ -78,7 +86,7 @@ public class MovieRepositoryImpl implements MovieRepository {
                             .title(tmdbMovie.getTitle())
                             .overview(tmdbMovie.getOverview())
                             .voteAverage(tmdbMovie.getVoteAverage())
-                            .posterPath(tmdbProperties.getImageBaseUrl() + tmdbMovie.getPosterPath())
+                            .posterPath(imageUrl + tmdbMovie.getPosterPath())
                             .build();
                     try {
                         if (tmdbMovie.getReleaseDate() != null && !tmdbMovie.getReleaseDate().isEmpty()) {
@@ -93,7 +101,7 @@ public class MovieRepositoryImpl implements MovieRepository {
 
                     return movie;
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -101,14 +109,14 @@ public class MovieRepositoryImpl implements MovieRepository {
         try {
             var response = tmdbClient.getMovieDetails(
                     id,
-                    tmdbProperties.getApiKey(),
-                    tmdbProperties.getLanguage());
+                    "Bearer " + apiKey,
+                    language);
             var movie =  Movie.builder()
                     .id(response.getId())
                     .title(response.getTitle())
                     .overview(response.getOverview())
                     .voteAverage(response.getVoteAverage())
-                    .posterPath(tmdbProperties.getImageBaseUrl() + response.getPosterPath())
+                    .posterPath(imageUrl + response.getPosterPath())
                     .build();
 
             List<String> genres = response.getGenres() != null ?
@@ -151,6 +159,7 @@ public class MovieRepositoryImpl implements MovieRepository {
     public List<Movie> getFavorites() {
         return movieJpaRepository.findAll().stream()
                 .map(movieMapper::toDomain)
-                .collect(Collectors.toList());
+                .toList();
     }
+
 }
