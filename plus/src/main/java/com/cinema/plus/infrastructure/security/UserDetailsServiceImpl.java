@@ -1,6 +1,5 @@
 package com.cinema.plus.infrastructure.security;
 
-import com.cinema.plus.infrastructure.mapper.UserMapper;
 import com.cinema.plus.infrastructure.persistence.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
