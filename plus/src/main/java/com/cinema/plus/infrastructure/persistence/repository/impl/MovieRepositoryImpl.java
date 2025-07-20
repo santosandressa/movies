@@ -17,7 +17,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 // Implementação do repositório - adaptador que implementa a porta definida no domínio
 // Aplicação do Princípio de Segregação de Interface (I do SOLID)
@@ -25,6 +24,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class MovieRepositoryImpl implements MovieRepository {
+    private static final String BEARER_PREFIX = "Bearer ";
+    private static final String UNABLE_TO_PARSE_RELEASE_DATE = "Unable to parse release date: {}";
     private final TmdbClient tmdbClient;
     private final MovieJpaRepository movieJpaRepository;
     private final MovieMapper movieMapper;
@@ -41,7 +42,7 @@ public class MovieRepositoryImpl implements MovieRepository {
     @Override
     public List<Movie> findPopularMovies(int page) {
         return tmdbClient.getPopularMovies(
-                        "Bearer " + apiKey,
+                        BEARER_PREFIX + apiKey,
                         page,
                         language)
                 .getResults()
@@ -55,15 +56,8 @@ public class MovieRepositoryImpl implements MovieRepository {
                             .voteAverage(tmdbMovie.getVoteAverage())
                             .posterPath(imageUrl + tmdbMovie.getPosterPath())
                             .build();
-                    try {
-                        if (tmdbMovie.getReleaseDate() != null && !tmdbMovie.getReleaseDate().isEmpty()) {
-                            movie.setReleaseDate(LocalDate.parse(tmdbMovie.getReleaseDate(), DateTimeFormatter.ISO_DATE));
-                        }
-                    } catch (DateTimeParseException e) {
-                        log.warn("Unable to parse release date: {}", tmdbMovie.getReleaseDate());
-                    }
+                    getReleaseDate(tmdbMovie.getReleaseDate(), movie);
 
-                    // Verificar se o filme está na lista de favoritos
                     movie.setFavorite(movieJpaRepository.existsById(movie.getId()));
 
                     return movie;
@@ -74,7 +68,7 @@ public class MovieRepositoryImpl implements MovieRepository {
     @Override
     public List<Movie> searchMovies(String query, int page) {
         return tmdbClient.searchMovies(
-                        "Bearer " + apiKey,
+                        BEARER_PREFIX + apiKey,
                         query,
                         page,
                         language)
@@ -88,15 +82,8 @@ public class MovieRepositoryImpl implements MovieRepository {
                             .voteAverage(tmdbMovie.getVoteAverage())
                             .posterPath(imageUrl + tmdbMovie.getPosterPath())
                             .build();
-                    try {
-                        if (tmdbMovie.getReleaseDate() != null && !tmdbMovie.getReleaseDate().isEmpty()) {
-                            movie.setReleaseDate(LocalDate.parse(tmdbMovie.getReleaseDate(), DateTimeFormatter.ISO_DATE));
-                        }
-                    } catch (DateTimeParseException e) {
-                        log.warn("Unable to parse release date: {}", tmdbMovie.getReleaseDate());
-                    }
+                    getReleaseDate(tmdbMovie.getReleaseDate(), movie);
 
-                    // Verificar se o filme está na lista de favoritos
                     movie.setFavorite(movieJpaRepository.existsById(movie.getId()));
 
                     return movie;
@@ -109,7 +96,7 @@ public class MovieRepositoryImpl implements MovieRepository {
         try {
             var response = tmdbClient.getMovieDetails(
                     id,
-                    "Bearer " + apiKey,
+                    BEARER_PREFIX + apiKey,
                     language);
             var movie =  Movie.builder()
                     .id(response.getId())
@@ -122,17 +109,11 @@ public class MovieRepositoryImpl implements MovieRepository {
             List<String> genres = response.getGenres() != null ?
                     response.getGenres().stream()
                             .map(TmdbMovieDetailResponse.Genre::getName)
-                            .collect(Collectors.toList()) :
+                            .toList() :
                     List.of();
             movie.setGenres(genres);
 
-            try {
-                if (response.getReleaseDate() != null && !response.getReleaseDate().isEmpty()) {
-                    movie.setReleaseDate(LocalDate.parse(response.getReleaseDate(), DateTimeFormatter.ISO_DATE));
-                }
-            } catch (DateTimeParseException e) {
-                log.warn("Unable to parse release date: {}", response.getReleaseDate());
-            }
+            getReleaseDate(response.getReleaseDate(), movie);
             movie.setFavorite(movieJpaRepository.existsById(movie.getId()));
 
             return Optional.of(movie);
@@ -140,6 +121,16 @@ public class MovieRepositoryImpl implements MovieRepository {
         } catch (Exception e) {
             log.error("Error fetching movie details for ID: {}", id, e);
             return Optional.empty();
+        }
+    }
+
+    private static void getReleaseDate(String response, Movie movie) {
+        try {
+            if (response != null && !response.isEmpty()) {
+                movie.setReleaseDate(LocalDate.parse(response, DateTimeFormatter.ISO_DATE));
+            }
+        } catch (DateTimeParseException e) {
+            log.warn(UNABLE_TO_PARSE_RELEASE_DATE, response);
         }
     }
 
