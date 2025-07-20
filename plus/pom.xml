@@ -32,7 +32,6 @@
         <lombok.version>1.18.30</lombok.version>
   <sonar.organization>santosandressa</sonar.organization>
   <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-</properties>
 	</properties>
 	<dependencies>
 	   <!-- Spring Boot -->
