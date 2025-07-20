@@ -204,38 +204,38 @@ EOF
         LAST_COMMIT_AUTHOR=$(git log -1 --pretty=format:"%an")
         
         PR_BODY="## Alterações
-        
+
         Últimas alterações feitas nesta branch:
         - **Último commit:** $LAST_COMMIT_MESSAGE
         - **Autor:** $LAST_COMMIT_AUTHOR
-        
+
         ## ✅ Verificações Automatizadas
         - [x] **Build Maven**: Compilação bem-sucedida
         - [x] **Testes unitários**: Todos os testes passaram
         - [x] **Java 21**: Compatibilidade verificada
         - [x] **Spring Boot 3.5.0**: Dependências resolvidas
-        
+
         ## Tecnologias do Projeto
         - **Java**: 21
         - **Spring Boot**: 3.5.0
         - **Banco**: PostgreSQL
         - **Segurança**: Spring Security + JWT
         - **Mapeamento**: MapStruct + Lombok
-        
+
         ## Tipo de mudança
         - [ ] Bug fix
         - [ ] Nova funcionalidade  
         - [ ] Breaking change
         - [ ] Documentação
         - [ ] Refatoração
-        
+
         ## Checklist
         - [x] Código compilado sem erros
         - [x] Testes unitários passando
         - [x] Dependências Maven resolvidas
         - [ ] Documentação atualizada
         - [ ] Code review solicitado
-        
+
         ---
         *PR criado automaticamente via GitHub Actions*
         *Build e testes executados automaticamente*"
