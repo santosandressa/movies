@@ -5,9 +5,7 @@ on:
     branches:
       - 'feature/**'  # Triggers para branches que começam com 'feature/'
       - 'developer'   # Trigger para a branch developer
-    # Exclui a branch main para evitar loops
-    branches-ignore:
-      - main
+    # Removido branches-ignore - não pode usar ambos no mesmo evento
 
 jobs:
   test-and-create-pr:
