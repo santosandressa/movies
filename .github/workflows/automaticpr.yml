@@ -25,15 +25,45 @@ jobs:
         distribution: 'temurin'
         cache: maven
     
+    - name: Find Maven project directory
+      id: find-maven
+      run: |
+        echo "🔍 Procurando por pom.xml..."
+        if [ -f "plus/pom.xml" ]; then
+          echo "📁 pom.xml encontrado em plus/"
+          echo "maven_dir=plus" >> $GITHUB_OUTPUT
+        elif [ -f "pom.xml" ]; then
+          echo "📁 pom.xml encontrado na raiz"
+          echo "maven_dir=." >> $GITHUB_OUTPUT
+        elif [ -f "backend/pom.xml" ]; then
+          echo "📁 pom.xml encontrado em backend/"
+          echo "maven_dir=backend" >> $GITHUB_OUTPUT
+        elif [ -f "server/pom.xml" ]; then
+          echo "📁 pom.xml encontrado em server/"
+          echo "maven_dir=server" >> $GITHUB_OUTPUT
+        elif [ -f "api/pom.xml" ]; then
+          echo "📁 pom.xml encontrado em api/"
+          echo "maven_dir=api" >> $GITHUB_OUTPUT
+        else
+          echo "❌ pom.xml não encontrado!"
+          echo "📂 Estrutura do projeto:"
+          find . -name "pom.xml" -type f | head -10
+          echo "📂 Conteúdo da raiz:"
+          ls -la
+          exit 1
+        fi
+
     - name: Install dependencies and compile
       run: |
         echo "📦 Instalando dependências e compilando..."
+        cd ${{ steps.find-maven.outputs.maven_dir }}
         mvn clean compile -DskipTests=true
         echo "✅ Compilação concluída!"
     
     - name: Run tests
       run: |
         echo "🧪 Executando testes unitários..."
+        cd ${{ steps.find-maven.outputs.maven_dir }}
         mvn test
         echo "✅ Todos os testes passaram!"
     
@@ -42,6 +72,7 @@ jobs:
       if: always()  # Sempre executa mesmo se os testes falharem
       run: |
         echo "📊 Gerando relatório de testes..."
+        cd ${{ steps.find-maven.outputs.maven_dir }}
         # Verifica se existem relatórios de teste
         if [ -d "target/surefire-reports" ]; then
           echo "📋 Relatórios encontrados em target/surefire-reports/"
@@ -52,6 +83,7 @@ jobs:
       continue-on-error: true  # Não falha se não tiver configurado
       run: |
         echo "🔍 Verificando qualidade do código..."
+        cd ${{ steps.find-maven.outputs.maven_dir }}
         # Executar verificações de estilo se tiver configurado
         mvn checkstyle:check -DskipTests=true || echo "⚠️  Checkstyle não configurado"
         
