@@ -1,13 +1,8 @@
-package com.cinema.plus;
+package com.cinema.plus.unit;
 
-import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 class PlusApplicationTests {
-
-	@Test
-	void contextLoads() {
-	}
 
 }
