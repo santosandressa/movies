@@ -1,8 +1,9 @@
-package com.cinema.plus.presentation.controller;
+package com.cinema.plus.unit.presentation.controller;
 
 import com.cinema.plus.application.service.UserService;
 import com.cinema.plus.domain.entity.CreateUserRequest;
 import com.cinema.plus.domain.entity.User;
+import com.cinema.plus.presentation.controller.UserController;
 import com.cinema.plus.presentation.dto.request.CreateUserRequestDTO;
 import com.cinema.plus.presentation.dto.request.UserDTO;
 import com.cinema.plus.presentation.mapper.UserRestMapper;
