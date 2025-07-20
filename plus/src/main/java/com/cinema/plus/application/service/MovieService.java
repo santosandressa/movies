@@ -3,9 +3,8 @@ package com.cinema.plus.application.service;
 import com.cinema.plus.domain.entity.Movie;
 import com.cinema.plus.domain.ports.repository.MovieRepository;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.LoggerFactory;
-
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,7 +27,7 @@ public class MovieService {
     }
 
     public List<Movie> searchMovies(String query, int page) {
-        log.info("Searching movies with query '{}' on page {}", query, page);
+        log.info("Searching for movies");
         return movieRepository.searchMovies(query, page);
     }
 

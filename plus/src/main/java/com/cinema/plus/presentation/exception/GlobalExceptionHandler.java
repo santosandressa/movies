@@ -16,7 +16,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 @ControllerAdvice
 @Slf4j
@@ -34,7 +33,7 @@ public class GlobalExceptionHandler {
 
         List<FieldDTO> fieldErrors = ex.getBindingResult().getFieldErrors().stream()
                 .map(this::createFieldDTO)
-                .collect(Collectors.toList());
+                .toList();
 
         ErrorDTO error = new ErrorDTO(
                 "Validation failed",
